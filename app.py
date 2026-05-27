@@ -3,41 +3,56 @@ import time
 
 app = Flask(__name__)
 
-def function(txt, pat, m, n):
+# Pattern Matching Function
+def pattern_match(txt, pat):
 
-    for i in range(m - n + 1):
+    n = len(txt)
+    m = len(pat)
 
-        if txt[i:n+i] == pat:
-            return i
+    positions = []
 
-    return -1
+    for i in range(n - m + 1):
 
-@app.route('/', methods=['GET', 'POST'])
+        if txt[i:i+m] == pat:
+            positions.append(i)
 
+    return positions
+
+
+# Home Route
+@app.route("/", methods=["GET", "POST"])
 def home():
 
     result = ""
     execution_time = ""
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
-        txt = request.form['text']
-        pat = request.form['pattern']
+        txt = request.form["text"]
+        pat = request.form["pattern"]
 
-        stime = time.time()
+        start_time = time.time()
 
-        pos = function(txt, pat, len(txt), len(pat))
+        result = pattern_match(txt, pat)
 
-        etime = time.time()
+        end_time = time.time()
 
-        result = pos
-        execution_time = etime - stime
+        execution_time = round((end_time - start_time), 6)
+
+        if len(result) == 0:
+            result = "Pattern Not Found"
 
     return render_template(
-        'index.html',
+        "index.html",
         result=result,
         execution_time=execution_time
     )
 
-if __name__ == '__main__':
+
+# Run Flask App
+if __name__ == "__main__":
     app.run(debug=True)
+
+
+# Required for Vercel
+app = app
